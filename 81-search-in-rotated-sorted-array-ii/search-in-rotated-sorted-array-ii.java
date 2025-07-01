@@ -1,26 +1,33 @@
 class Solution {
   public boolean search(int[] nums, int target) {
-    int l = 0;
-    int r = nums.length - 1;
+    int low = 0, high = nums.length - 1;
 
-    while (l <= r) {
-      final int m = (l + r) / 2;
-      if (nums[m] == target)
-        return true;
-      if (nums[l] == nums[m] && nums[m] == nums[r]) {
-        ++l;
-        --r;
-      } else if (nums[l] <= nums[m]) { // nums[l..m] are sorted
-        if (nums[l] <= target && target < nums[m])
-          r = m - 1;
-        else
-          l = m + 1;
-      } else { // nums[m..n - 1] are sorted
-        if (nums[m] < target && target <= nums[r])
-          l = m + 1;
-        else
-          r = m - 1;
-      }
+    while (low <= high) {
+        int mid = (low + high) / 2;
+
+        if (nums[mid] == target) return true;
+
+        // If we can't determine the sorted side
+        if (nums[low] == nums[mid] && nums[mid] == nums[high]) {
+            low++;
+            high--;
+        }
+        // Left side is sorted
+        else if (nums[low] <= nums[mid]) {
+            if (nums[low] <= target && target < nums[mid]) {
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        // Right side is sorted
+        else {
+            if (nums[mid] < target && target <= nums[high]) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
     }
 
     return false;

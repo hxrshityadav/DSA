@@ -1,19 +1,15 @@
 class Solution {
     public boolean check(int[] nums) {
-    int count = 0;
-    int n = nums.length;
-    
-    for (int i = 0; i < n - 1; i++) {
-        if (nums[i] > nums[i + 1]) {
-            count++;
+        int len = nums.length;
+        int deviations = 0;
+        for(int i=0;i< len;i++){
+            if(i<len -1 && nums[i] > nums[i+1]){
+                deviations++;
+            }
+            else if (i==len-1 && nums[len-1]> nums[0]){
+                deviations++;
+            }
         }
+        return (deviations>1)? false:true;
     }
-
-    // Check circular break between last and first
-    if (nums[n - 1] > nums[0]) {
-        count++;
-    }
-
-    return count <= 1;
-}
 }

@@ -1,27 +1,28 @@
 class Solution {
-    public static int getSecondLargest(int[] arr) {
+
+    public int getSecondLargest(int[] arr) {
+        if (arr.length < 2) {
+            return -1;
+        }
+
         int largest = arr[0];
-        int second = -1;
-        
+        int slargest = -1;
+
         for (int i = 1; i < arr.length; i++) {
             if (arr[i] > largest) {
-                second = largest;
+                slargest = largest;
                 largest = arr[i];
-            } else if (arr[i] < largest && arr[i] > second) {
-                second = arr[i];
+            } else if (arr[i] < largest && arr[i] > slargest) {
+                slargest = arr[i];
             }
         }
-        return second;
+
+        return slargest;
     }
-    
+
     public static void main(String[] args) {
-        int arr1[] = {12, 35, 1, 10, 34, 1};
-        System.out.println(getSecondLargest(arr1));  // 34
-        
-        int arr2[] = {10, 5, 10};
-        System.out.println(getSecondLargest(arr2));  // 5
-        
-        int arr3[] = {10, 10, 10};
-        System.out.println(getSecondLargest(arr3));  // -1
+        int[] arr = {12, 35, 1, 10, 34, 1};
+        Solution sol = new Solution();
+        System.out.println(sol.getSecondLargest(arr));
     }
 }

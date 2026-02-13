@@ -1,12 +1,19 @@
 class Solution {
-  public boolean check(int[] nums) {
-    final int n = nums.length;
-    int rotates = 0;
+    public boolean check(int[] nums) {
+        int len = nums.length;
+        int dev = 0;
 
-    for (int i = 0; i < n; ++i)
-      if (nums[i] > nums[(i + 1) % n] && ++rotates > 1)
-        return false;
+        for (int i = 1; i < len; i++) {
+            if (nums[i] < nums[i - 1]) {
+                dev++;
+            }
+        }
 
-    return true;
-  }
+       
+        if (nums[0] < nums[len - 1]) {
+            dev++;
+        }
+
+        return dev <= 1;
+    }
 }

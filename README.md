@@ -1,170 +1,185 @@
+<!-- AI-STATS-START -->
+<!-- AI-STATS-END -->
+
 <div align="center">
 
-```
+​```
 ██████╗ ███████╗ █████╗
 ██╔══██╗██╔════╝██╔══██╗
 ██║  ██║███████╗███████║
 ██║  ██║╚════██║██╔══██║
 ██████╔╝███████║██║  ██║
 ╚═════╝ ╚══════╝╚═╝  ╚═╝
-```
+​```
 
-### *323 commits. 94 problems. 0 excuses.*
+### `{ Data Structures & Algorithms }`
+#### *by* [**@hxrshityadav**](https://github.com/hxrshityadav)
 
-[![Problems Solved](https://img.shields.io/badge/Problems%20Solved-94-0f172a?style=for-the-badge&logo=target&logoColor=white)](https://github.com/hxrshityadav/DSA)
-[![LeetCode](https://img.shields.io/badge/LeetCode-Auto--Synced-FFA116?style=for-the-badge&logo=leetcode&logoColor=black)](https://leetcode.com/hxrshityadav)
-[![GFG](https://img.shields.io/badge/GeeksForGeeks-Auto--Synced-2F8D46?style=for-the-badge&logo=geeksforgeeks&logoColor=white)](https://geeksforgeeks.org/user/hxrshityadav)
+<br/>
+
+> ### ⚡ 324 commits. 94 problems. 0 excuses.
+
+<br/>
+
+[![Activity](https://img.shields.io/badge/Activity-Active-brightgreen?style=for-the-badge&logo=github&logoColor=white)](https://github.com/hxrshityadav/DSA)
+[![Security](https://img.shields.io/badge/Security-100%25-blue?style=for-the-badge&logo=shield&logoColor=white)](https://github.com/hxrshityadav/DSA)
+[![Momentum](https://img.shields.io/badge/Momentum-Stable-orange?style=for-the-badge&logo=lightning&logoColor=white)](https://github.com/hxrshityadav/DSA)
+[![Quality](https://img.shields.io/badge/Quality-33%2F100-yellow?style=for-the-badge&logo=codeclimate&logoColor=white)](https://github.com/hxrshityadav/DSA)
+[![Health](https://img.shields.io/badge/Health-C-red?style=for-the-badge&logo=heart&logoColor=white)](https://github.com/hxrshityadav/DSA)
+
 [![Java](https://img.shields.io/badge/Java-100%25-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://github.com/hxrshityadav/DSA)
-[![Activity](https://img.shields.io/badge/Activity-🔥%20Active-22c55e?style=for-the-badge)](https://github.com/hxrshityadav/DSA/commits/main)
-[![Commits](https://img.shields.io/badge/Total%20Commits-323-6366f1?style=for-the-badge&logo=git&logoColor=white)](https://github.com/hxrshityadav/DSA/commits/main)
+[![LeetCode](https://img.shields.io/badge/LeetCode-Auto--Synced-FFA116?style=for-the-badge&logo=leetcode&logoColor=black)](https://leetcode.com/hxrshityadav)
+[![GFG](https://img.shields.io/badge/GFG-Auto--Synced-2F8D46?style=for-the-badge&logo=geeksforgeeks&logoColor=white)](https://auth.geeksforgeeks.org/user/hxrshityadav)
 
 </div>
-
----
-
-## 📌 What This Is
-
-This is my **live DSA practice repository** — every solution I write on LeetCode or GeeksForGeeks gets **automatically committed here** within minutes, no manual push needed.
-
-Built on two Chrome extensions:
-- **[LeetSync](https://github.com/LeetSync/LeetSync)** — auto-pushes accepted LC submissions
-- **[GFG to GitHub](https://github.com/Sahil-Ajmera-18/GFG-to-github)** — auto-pushes GFG solutions
-
-Every file here is a solved problem. Every commit is a rep. This repo is running while I sleep.
 
 ---
 
 ## 📊 Stats Dashboard
 
+<!-- AI-STATS-START -->
+
+| Metric | Value |
+|--------|-------|
+| 🔥 Total Commits | **324** |
+| ✅ Problems Solved | **94** |
+| 💻 Platform: LeetCode | Auto-Synced via LeetSync |
+| 🌿 Platform: GFG | Auto-Synced via GFG-to-GitHub |
+| 📁 Total Files | **199** |
+| 🌍 Language | **100% Java** |
+| 📅 Streak Status | **Active** |
+
+> *"324 commits. 94 problems. 0 excuses."*
+
+<!-- AI-STATS-END -->
+
+---
+
+## 🗂️ Repository Architecture
+
+​```
+hxrshityadav/DSA/
+│
+├── 📁 leetcode/                        ← LeetSync auto-pushes here
+│   ├── 📁 two-sum/
+│   │   └── Solution.java
+│   ├── 📁 best-time-to-buy-and-sell-stock/
+│   │   └── Solution.java
+│   ├── 📁 valid-parentheses/
+│   │   └── Solution.java
+│   └── 📁 <problem-slug>/              ← kebab-case slug from LeetCode URL
+│       └── Solution.java
+│
+├── 📁 gfg/                             ← GFG-to-GitHub auto-pushes here
+│   ├── 📁 reverse-a-linked-list/
+│   │   └── Solution.java
+│   ├── 📁 detect-loop-in-linked-list/
+│   │   └── Solution.java
+│   └── 📁 <problem-name>/              ← kebab-case from GFG problem title
+│       └── Solution.java
+│
+├── 📁 scripts/
+│   └── generate_readme.py              ← AI-powered README updater
+│
+├── 📁 .github/
+│   └── 📁 workflows/
+│       └── update-readme.yml           ← CI/CD automation pipeline
+│
+├── CONTRIBUTING.md                     ← Project Discipline rules
+└── README.md                           ← This file (auto-updated by AI)
+​```
+
+---
+
+## 🤖 Automation Flow
+
+​```
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                    AUTOMATION PIPELINE                          │
+  └─────────────────────────────────────────────────────────────────┘
+
+  You solve a problem on LeetCode or GFG
+         │
+         ▼
+  ┌──────────────────┐     ┌──────────────────────┐
+  │   LeetSync       │     │   GFG-to-GitHub      │
+  │ (Chrome Ext.)    │     │   (Chrome Ext.)      │
+  └────────┬─────────┘     └──────────┬───────────┘
+           │                          │
+           ▼                          ▼
+  ┌─────────────────────────────────────────────┐
+  │         GitHub: hxrshityadav/DSA            │
+  │   Auto-commit → push → main branch          │
+  └──────────────────────┬──────────────────────┘
+                         │  triggers (on push)
+                         ▼
+  ┌─────────────────────────────────────────────┐
+  │        GitHub Actions Workflow              │
+  │        update-readme.yml                    │
+  │                                             │
+  │   1. Checkout code                          │
+  │   2. Setup Python 3.11                      │
+  │   3. pip install anthropic                  │
+  │   4. python scripts/generate_readme.py      │
+  └──────────────────────┬──────────────────────┘
+                         │
+                         ▼
+  ┌─────────────────────────────────────────────┐
+  │       scripts/generate_readme.py            │
+  │                                             │
+  │   • Count .java files in leetcode/ & gfg/  │
+  │   • Run `git log` → get commit count        │
+  │   • Build prompt with live metrics          │
+  │   • Call Anthropic API (claude-opus-4-5)   │
+  │   • Inject AI response into README.md       │
+  └──────────────────────┬──────────────────────┘
+                         │
+                         ▼
+  ┌─────────────────────────────────────────────┐
+  │   github-actions[bot] commits README.md     │
+  │   back to main branch                       │
+  └─────────────────────────────────────────────┘
+​```
+
+---
+
+## 🧩 Topics Covered
+
 <div align="center">
 
-| 📈 Metric | 🔢 Value |
-|---|---|
-| **Total Problems Solved** | 94 |
-| **Total Commits** | 323 |
-| **Commits Last Month** | 22 |
-| **Avg Commits / Week** | 5.6 |
-| **Primary Language** | Java ☕ |
-| **Repo Created** | March 8, 2025 |
-| **Last Commit** | April 3, 2026 |
-| **Streak Status** | 🔥 Active |
+| 🗃️ Arrays | 🔗 LinkedList | 📚 Stack | 🎯 Queue |
+|:---:|:---:|:---:|:---:|
+| ✅ Active | ✅ Active | ✅ Active | ✅ Active |
+
+| 🔍 Binary Search | 🔄 Recursion | 🌳 Trees | 🕸️ Graphs |
+|:---:|:---:|:---:|:---:|
+| ✅ Active | ✅ Active | ✅ Active | ✅ Active |
+
+| 🧠 DP | 💰 Greedy | #️⃣ Hashing | 👆 Two Pointers |
+|:---:|:---:|:---:|:---:|
+| ✅ Active | ✅ Active | ✅ Active | ✅ Active |
 
 </div>
 
 ---
 
-## 🗂️ Repository Structure
-
-```
-DSA/
-├── 📁 leetcode/
-│   └── 📁 <problem-slug>/
-│       └── 📄 Solution.java        ← auto-committed by LeetSync
-│
-├── 📁 gfg/
-│   └── 📁 <problem-name>/
-│       └── 📄 Solution.java        ← auto-committed by GFG extension
-│
-└── 📁 .github/
-    └── 📁 workflows/
-        └── ⚙️ update-readme.yml    ← auto-regenerates this README
-```
-
----
-
-## 🧠 Topics Covered
-
-| 🏷️ Topic | Status |
-|---|---|
-| Arrays & Strings | ✅ Active |
-| Linked Lists | ✅ Active |
-| Stacks & Queues | ✅ Active |
-| Binary Search | ✅ Active |
-| Recursion & Backtracking | ✅ Active |
-| Trees & Binary Trees | ✅ Active |
-| Graphs (BFS / DFS) | ✅ Active |
-| Dynamic Programming | ✅ Active |
-| Greedy Algorithms | ✅ Active |
-| Sorting & Searching | ✅ Active |
-| Hashing | ✅ Active |
-| Two Pointers / Sliding Window | ✅ Active |
-
----
-
-## ⚙️ How The Automation Works
-
-```
-You solve a problem on LeetCode or GFG
-           ↓
-Chrome extension detects accepted submission
-           ↓
-Auto-commits solution to this repo (main branch)
-           ↓
-GitHub Actions triggers on push
-           ↓
-Python script scans repo → calls Claude API
-           ↓
-README.md gets regenerated with fresh stats
-           ↓
-Bot commits updated README [skip ci]
-```
-
-Zero manual work. The repo documents itself.
-
----
-
-## 🚀 Setup (If You Want to Clone This System)
-
-### 1. Chrome Extensions
-- Install **LeetSync** → connect your GitHub → point to this repo
-- Install **GFG to GitHub** → same repo target
-
-### 2. GitHub Actions Secret
-```
-Settings → Secrets → Actions → New secret
-Name: ANTHROPIC_API_KEY
-Value: sk-ant-...
-```
-
-### 3. Add the Workflow File
-```bash
-.github/workflows/update-readme.yml
-scripts/generate_readme.py
-```
-
-Push once → everything auto-runs from there.
-
----
-
-## 🔗 Connect
+## 🌐 Connect with Me
 
 <div align="center">
 
-[![GitHub](https://img.shields.io/badge/GitHub-hxrshityadav-181717?style=for-the-badge&logo=github)](https://github.com/hxrshityadav)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Harshit%20Yadav-0077B5?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/hxrshityadav)
-[![X](https://img.shields.io/badge/X-@hxrshityadav-000000?style=for-the-badge&logo=x)](https://x.com/hxrshityadav)
-[![Telegram](https://img.shields.io/badge/Telegram-5K%2B%20Subscribers-26A5E4?style=for-the-badge&logo=telegram)](https://t.me/hxrshityadav)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-hxrshityadav-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/hxrshityadav)
+[![X](https://img.shields.io/badge/X-@hxrshityadav-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/hxrshityadav)
+[![Telegram](https://img.shields.io/badge/Telegram-5K%2B_Subscribers-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/hxrshityadav)
+[![LeetCode](https://img.shields.io/badge/LeetCode-hxrshityadav-FFA116?style=for-the-badge&logo=leetcode&logoColor=black)](https://leetcode.com/hxrshityadav)
+[![GeeksForGeeks](https://img.shields.io/badge/GFG-hxrshityadav-2F8D46?style=for-the-badge&logo=geeksforgeeks&logoColor=white)](https://auth.geeksforgeeks.org/user/hxrshityadav)
 
 </div>
 
 ---
 
-## 📅 Consistency Log
-
-> This section is auto-updated by GitHub Actions on every push.
-
-- **Last auto-update:** `April 4, 2026`
-- **Total source files:** `94`
-- **Total repo files:** `198`
-- **Avg files/directory:** `1.9`
-
----
-
 <div align="center">
 
-*"Kal se nahi. Aaj se. This is the grind."*
-
-**— Project Discipline**
+*Auto-updated by [GitHub Actions](https://github.com/hxrshityadav/DSA/actions) + [Claude AI](https://anthropic.com) — Part of **Project Discipline***
 
 ![Visitor Count](https://visitor-badge.laobi.icu/badge?page_id=hxrshityadav.DSA)
 

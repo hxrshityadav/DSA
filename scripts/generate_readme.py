@@ -5,11 +5,11 @@ generate_readme.py
 Part of Project Discipline | hxrshityadav/DSA
 Author  : Harshit Yadav (@hxrshityadav)
 Purpose : Scans the repo, collects live metrics, calls the Google Gemini API
-          (gemini-1.5-flash), and injects an AI-generated stats block back
+          (gemini-2.0-flash), and injects an AI-generated stats block back
           into README.md between the markers.
 
 Setup:
-    pip install google-generativeai
+    pip install google-genai
     export GEMINI_API_KEY="your_key_here"
 
 Get your free API key at: https://aistudio.google.com/app/apikey
@@ -22,7 +22,8 @@ import sys
 import textwrap
 from pathlib import Path
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 # ──────────────────────────────────────────────
 # CONSTANTS
@@ -36,7 +37,7 @@ GFG_DIR      = REPO_ROOT / "gfg"
 MARKER_START = "<!-- AI-STATS-START -->"
 MARKER_END   = "<!-- AI-STATS-END -->"
 
-GEMINI_MODEL = "gemini-1.5-flash"   # Free tier — generous limits
+GEMINI_MODEL = "gemini-2.0-flash"   # Free tier — current stable model
 
 
 # ──────────────────────────────────────────────
@@ -44,24 +45,15 @@ GEMINI_MODEL = "gemini-1.5-flash"   # Free tier — generous limits
 # ──────────────────────────────────────────────
 
 def count_java_files(directory: Path) -> int:
-    """
-    Recursively count all .java files inside the given directory.
-    Returns 0 gracefully if the directory does not exist yet.
-    """
     if not directory.exists():
         print(f"[WARN] Directory not found, skipping: {directory}")
         return 0
-
     count = sum(1 for _ in directory.rglob("*.java"))
     print(f"[INFO] Found {count} .java file(s) in '{directory.name}/'")
     return count
 
 
 def get_commit_count() -> int:
-    """
-    Run git rev-list --count HEAD to get the total commit count.
-    Falls back to 0 on any subprocess error.
-    """
     try:
         result = subprocess.run(
             ["git", "rev-list", "--count", "HEAD"],
@@ -82,9 +74,6 @@ def get_commit_count() -> int:
 
 
 def collect_metrics() -> dict:
-    """
-    Aggregate all live repo metrics into a single dictionary.
-    """
     leet_count     = count_java_files(LEETCODE_DIR)
     gfg_count      = count_java_files(GFG_DIR)
     total_problems = leet_count + gfg_count
@@ -109,9 +98,6 @@ def collect_metrics() -> dict:
 # ──────────────────────────────────────────────
 
 def build_prompt(metrics: dict) -> str:
-    """
-    Build the prompt sent to Gemini.
-    """
     prompt = textwrap.dedent(f"""
         You are the AI engine behind "Project Discipline", a personal branding
         system for competitive programmer Harshit Yadav (@hxrshityadav).
@@ -152,57 +138,47 @@ def build_prompt(metrics: dict) -> str:
 
 
 def call_gemini_api(prompt: str) -> str:
-    """
-    Call the Google Gemini API using gemini-1.5-flash (free tier).
-    """
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         print("[ERROR] GEMINI_API_KEY environment variable is not set.")
         print("[HINT]  Get a free key at: https://aistudio.google.com/app/apikey")
         sys.exit(1)
 
-    genai.configure(api_key=api_key)
-
     try:
         print(f"[INFO] Calling Gemini API ({GEMINI_MODEL})...")
 
-        model = genai.GenerativeModel(
-            model_name=GEMINI_MODEL,
-            generation_config=genai.types.GenerationConfig(
+        client = genai.Client(api_key=api_key)
+
+        response = client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            config=types.GenerateContentConfig(
                 temperature=0.7,
                 max_output_tokens=1024,
             ),
         )
-
-        response = model.generate_content(prompt)
 
         if not response.text:
             print("[ERROR] Gemini API returned an empty response.")
             sys.exit(1)
 
         generated_text = response.text.strip()
-
-        # Strip markdown code fences if the model adds them despite instructions
         generated_text = strip_code_fences(generated_text)
 
-        print(
-            f"[INFO] API call successful. "
-            f"Finish reason: {response.candidates[0].finish_reason.name}"
-        )
+        print(f"[INFO] API call successful.")
         return generated_text
 
     except Exception as exc:
-        # Catch-all with helpful messages for the most common errors
         error_msg = str(exc).lower()
 
         if "api_key" in error_msg or "api key" in error_msg or "invalid" in error_msg:
             print(f"[ERROR] Invalid GEMINI_API_KEY. Check your GitHub Secret. Details: {exc}")
         elif "quota" in error_msg or "rate" in error_msg or "429" in error_msg:
-            print(f"[ERROR] Gemini rate limit / quota exceeded. Will retry on next push. Details: {exc}")
+            print(f"[ERROR] Gemini rate limit / quota exceeded. Details: {exc}")
         elif "connection" in error_msg or "network" in error_msg or "timeout" in error_msg:
             print(f"[ERROR] Network error while calling Gemini API: {exc}")
         elif "blocked" in error_msg or "safety" in error_msg:
-            print(f"[ERROR] Gemini safety filter triggered. Adjust the prompt. Details: {exc}")
+            print(f"[ERROR] Gemini safety filter triggered. Details: {exc}")
         else:
             print(f"[ERROR] Gemini API error: {exc}")
 
@@ -210,20 +186,11 @@ def call_gemini_api(prompt: str) -> str:
 
 
 def strip_code_fences(text: str) -> str:
-    """
-    Remove leading/trailing markdown code fences (```markdown, ```md, ```)
-    in case the model adds them despite the prompt instructions.
-    """
     lines = text.splitlines()
-
-    # Remove leading fence
     if lines and lines[0].startswith("```"):
         lines = lines[1:]
-
-    # Remove trailing fence
     if lines and lines[-1].strip() == "```":
         lines = lines[:-1]
-
     return "\n".join(lines).strip()
 
 
@@ -232,25 +199,18 @@ def strip_code_fences(text: str) -> str:
 # ──────────────────────────────────────────────
 
 def read_readme() -> str:
-    """Read the current README.md content."""
     if not README_PATH.exists():
         print(f"[ERROR] README.md not found at {README_PATH}")
         sys.exit(1)
-
     content = README_PATH.read_text(encoding="utf-8")
     print(f"[INFO] README.md loaded ({len(content)} chars)")
     return content
 
 
 def inject_stats_block(readme_content: str, ai_generated_block: str) -> str:
-    """
-    Replace everything between the AI-STATS markers with the
-    AI-generated block, keeping the markers themselves intact.
-    """
     if MARKER_START not in readme_content:
         print(f"[ERROR] Marker '{MARKER_START}' not found in README.md")
         sys.exit(1)
-
     if MARKER_END not in readme_content:
         print(f"[ERROR] Marker '{MARKER_END}' not found in README.md")
         sys.exit(1)
@@ -262,9 +222,7 @@ def inject_stats_block(readme_content: str, ai_generated_block: str) -> str:
         flags=re.DOTALL,
     )
 
-    updated_content, substitution_count = pattern.subn(
-        new_block, readme_content, count=1
-    )
+    updated_content, substitution_count = pattern.subn(new_block, readme_content, count=1)
 
     if substitution_count == 0:
         print("[ERROR] Regex substitution failed — no markers replaced.")
@@ -275,7 +233,6 @@ def inject_stats_block(readme_content: str, ai_generated_block: str) -> str:
 
 
 def write_readme(content: str) -> None:
-    """Write the updated content back to README.md."""
     README_PATH.write_text(content, encoding="utf-8")
     print(f"[INFO] README.md updated at {README_PATH}")
 
@@ -290,17 +247,17 @@ def main() -> None:
     print("  repo: hxrshityadav/DSA")
     print("=" * 60)
 
-    metrics      = collect_metrics()
-    prompt       = build_prompt(metrics)
-    ai_block     = call_gemini_api(prompt)
+    metrics        = collect_metrics()
+    prompt         = build_prompt(metrics)
+    ai_block       = call_gemini_api(prompt)
 
     print("[INFO] AI-generated block preview:")
     print("─" * 40)
     print(ai_block)
     print("─" * 40)
 
-    readme_content  = read_readme()
-    updated_readme  = inject_stats_block(readme_content, ai_block)
+    readme_content = read_readme()
+    updated_readme = inject_stats_block(readme_content, ai_block)
     write_readme(updated_readme)
 
     print("[DONE] Project Discipline README update complete. ✅")

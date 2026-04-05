@@ -28,7 +28,7 @@ jobs:
       - name: "📦 Install Dependencies"
         run: |
           python -m pip install --upgrade pip
-          pip install google-generativeai
+          pip install google-genai
       - name: "✨ Generate AI-Powered README"
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

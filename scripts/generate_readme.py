@@ -4,9 +4,15 @@ generate_readme.py
 ------------------
 Part of Project Discipline | hxrshityadav/DSA
 Author  : Harshit Yadav (@hxrshityadav)
-Purpose : Scans the repo, collects live metrics, calls the Anthropic API
-          (claude-opus-4-5), and injects an AI-generated stats block back
+Purpose : Scans the repo, collects live metrics, calls the Google Gemini API
+          (gemini-1.5-flash), and injects an AI-generated stats block back
           into README.md between the markers.
+
+Setup:
+    pip install google-generativeai
+    export GEMINI_API_KEY="your_key_here"
+
+Get your free API key at: https://aistudio.google.com/app/apikey
 """
 
 import os
@@ -16,7 +22,7 @@ import sys
 import textwrap
 from pathlib import Path
 
-import anthropic
+import google.generativeai as genai
 
 # ──────────────────────────────────────────────
 # CONSTANTS
@@ -30,7 +36,7 @@ GFG_DIR      = REPO_ROOT / "gfg"
 MARKER_START = "<!-- AI-STATS-START -->"
 MARKER_END   = "<!-- AI-STATS-END -->"
 
-ANTHROPIC_MODEL = "claude-opus-4-5"
+GEMINI_MODEL = "gemini-1.5-flash"   # Free tier — generous limits
 
 
 # ──────────────────────────────────────────────
@@ -99,12 +105,12 @@ def collect_metrics() -> dict:
 
 
 # ──────────────────────────────────────────────
-# ANTHROPIC API CALL
+# GEMINI API CALL
 # ──────────────────────────────────────────────
 
 def build_prompt(metrics: dict) -> str:
     """
-    Build the prompt sent to Claude.
+    Build the prompt sent to Gemini.
     """
     prompt = textwrap.dedent(f"""
         You are the AI engine behind "Project Discipline", a personal branding
@@ -145,54 +151,80 @@ def build_prompt(metrics: dict) -> str:
     return prompt
 
 
-def call_anthropic_api(prompt: str) -> str:
+def call_gemini_api(prompt: str) -> str:
     """
-    Call the Anthropic Messages API using claude-opus-4-5.
+    Call the Google Gemini API using gemini-1.5-flash (free tier).
     """
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        print("[ERROR] ANTHROPIC_API_KEY environment variable is not set.")
+        print("[ERROR] GEMINI_API_KEY environment variable is not set.")
+        print("[HINT]  Get a free key at: https://aistudio.google.com/app/apikey")
         sys.exit(1)
 
-    client = anthropic.Anthropic(api_key=api_key)
+    genai.configure(api_key=api_key)
 
     try:
-        print("[INFO] Calling Anthropic API (claude-opus-4-5)...")
-        message = client.messages.create(
-            model=ANTHROPIC_MODEL,
-            max_tokens=1024,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
+        print(f"[INFO] Calling Gemini API ({GEMINI_MODEL})...")
+
+        model = genai.GenerativeModel(
+            model_name=GEMINI_MODEL,
+            generation_config=genai.types.GenerationConfig(
+                temperature=0.7,
+                max_output_tokens=1024,
+            ),
         )
 
-        if not message.content:
-            print("[ERROR] Anthropic API returned an empty content list.")
+        response = model.generate_content(prompt)
+
+        if not response.text:
+            print("[ERROR] Gemini API returned an empty response.")
             sys.exit(1)
 
-        generated_text = message.content[0].text.strip()
+        generated_text = response.text.strip()
+
+        # Strip markdown code fences if the model adds them despite instructions
+        generated_text = strip_code_fences(generated_text)
+
         print(
-            f"[INFO] API call successful. Tokens used — "
-            f"input: {message.usage.input_tokens}, "
-            f"output: {message.usage.output_tokens}"
+            f"[INFO] API call successful. "
+            f"Finish reason: {response.candidates[0].finish_reason.name}"
         )
         return generated_text
 
-    except anthropic.AuthenticationError:
-        print("[ERROR] Invalid ANTHROPIC_API_KEY. Check your GitHub Secret.")
+    except Exception as exc:
+        # Catch-all with helpful messages for the most common errors
+        error_msg = str(exc).lower()
+
+        if "api_key" in error_msg or "api key" in error_msg or "invalid" in error_msg:
+            print(f"[ERROR] Invalid GEMINI_API_KEY. Check your GitHub Secret. Details: {exc}")
+        elif "quota" in error_msg or "rate" in error_msg or "429" in error_msg:
+            print(f"[ERROR] Gemini rate limit / quota exceeded. Will retry on next push. Details: {exc}")
+        elif "connection" in error_msg or "network" in error_msg or "timeout" in error_msg:
+            print(f"[ERROR] Network error while calling Gemini API: {exc}")
+        elif "blocked" in error_msg or "safety" in error_msg:
+            print(f"[ERROR] Gemini safety filter triggered. Adjust the prompt. Details: {exc}")
+        else:
+            print(f"[ERROR] Gemini API error: {exc}")
+
         sys.exit(1)
-    except anthropic.RateLimitError:
-        print("[ERROR] Anthropic rate limit hit. Will retry on next push.")
-        sys.exit(1)
-    except anthropic.APIConnectionError as exc:
-        print(f"[ERROR] Network error while calling Anthropic API: {exc}")
-        sys.exit(1)
-    except anthropic.APIStatusError as exc:
-        print(f"[ERROR] Anthropic API status {exc.status_code}: {exc.message}")
-        sys.exit(1)
+
+
+def strip_code_fences(text: str) -> str:
+    """
+    Remove leading/trailing markdown code fences (```markdown, ```md, ```)
+    in case the model adds them despite the prompt instructions.
+    """
+    lines = text.splitlines()
+
+    # Remove leading fence
+    if lines and lines[0].startswith("```"):
+        lines = lines[1:]
+
+    # Remove trailing fence
+    if lines and lines[-1].strip() == "```":
+        lines = lines[:-1]
+
+    return "\n".join(lines).strip()
 
 
 # ──────────────────────────────────────────────
@@ -254,13 +286,13 @@ def write_readme(content: str) -> None:
 
 def main() -> None:
     print("=" * 60)
-    print("  Project Discipline — README Auto-Updater")
+    print("  Project Discipline — README Auto-Updater (Gemini)")
     print("  repo: hxrshityadav/DSA")
     print("=" * 60)
 
     metrics      = collect_metrics()
     prompt       = build_prompt(metrics)
-    ai_block     = call_anthropic_api(prompt)
+    ai_block     = call_gemini_api(prompt)
 
     print("[INFO] AI-generated block preview:")
     print("─" * 40)

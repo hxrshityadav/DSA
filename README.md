@@ -39,16 +39,17 @@
 <!-- AI-STATS-START -->
 
 | Metric | Value |
-|:-------|:------|
-| 🔥 Total Commits | **324** |
-| ✅ Problems Solved | **94** |
-| 💻 LeetCode | Auto-Synced via LeetSync |
-| 🌿 GeeksForGeeks | Auto-Synced via GFG-to-GitHub |
-| 📁 Total Files | **199** |
-| 🌍 Language | **100% Java** |
-| 📅 Streak Status | **Active** |
+| :--- | :--- |
+| 🚀 Total Git Commits | **342** |
+| 🧩 Problems on LeetCode | **74** |
+| 🎓 Problems on GFG | **0** |
+| 🏆 Total Problems Solved | **74** |
+| 💻 Primary Language | Java (**100%**) |
+| 🔄 Sync Method (LC) | Auto-Synced via LeetSync |
+| 🔄 Sync Method (GFG) | Auto-Synced via GFG-to-GitHub |
+| 🔥 Streak Status | Active |
 
-> *"324 commits. 94 problems. 0 excuses."*
+> "342 commits. 74 problems. 0 excuses."
 
 <!-- AI-STATS-END -->
 

@@ -4,15 +4,15 @@ generate_readme.py
 ------------------
 Part of Project Discipline | hxrshityadav/DSA
 Author  : Harshit Yadav (@hxrshityadav)
-Purpose : Scans the repo, collects live metrics, calls the Google Gemini API
-          (gemini-2.0-flash), and injects an AI-generated stats block back
+Purpose : Scans the repo, collects live metrics, calls NVIDIA's Gemma 4 API
+          (google/gemma-4-31b-it), and injects an AI-generated stats block
           into README.md between the markers.
 
 Setup:
-    pip install google-genai
-    export GEMINI_API_KEY="your_key_here"
+    pip install requests
+    export NVIDIA_API_KEY="nvapi-your_key_here"
 
-Get your free API key at: https://aistudio.google.com/app/apikey
+Get your free API key at: https://build.nvidia.com/settings/api-keys
 """
 
 import os
@@ -20,10 +20,8 @@ import re
 import subprocess
 import sys
 import textwrap
+import requests
 from pathlib import Path
-
-from google import genai
-from google.genai import types
 
 # ──────────────────────────────────────────────
 # CONSTANTS
@@ -37,7 +35,8 @@ GFG_DIR      = REPO_ROOT / "gfg"
 MARKER_START = "<!-- AI-STATS-START -->"
 MARKER_END   = "<!-- AI-STATS-END -->"
 
-GEMINI_MODEL = "gemini-2.0-flash"   # Free tier — current stable model
+NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
+NVIDIA_MODEL   = "google/gemma-4-31b-it"
 
 
 # ──────────────────────────────────────────────
@@ -94,7 +93,7 @@ def collect_metrics() -> dict:
 
 
 # ──────────────────────────────────────────────
-# GEMINI API CALL
+# NVIDIA GEMMA API CALL
 # ──────────────────────────────────────────────
 
 def build_prompt(metrics: dict) -> str:
@@ -137,51 +136,69 @@ def build_prompt(metrics: dict) -> str:
     return prompt
 
 
-def call_gemini_api(prompt: str) -> str:
-    api_key = os.environ.get("GEMINI_API_KEY")
+def call_nvidia_api(prompt: str) -> str:
+    api_key = os.environ.get("NVIDIA_API_KEY")
     if not api_key:
-        print("[ERROR] GEMINI_API_KEY environment variable is not set.")
-        print("[HINT]  Get a free key at: https://aistudio.google.com/app/apikey")
+        print("[ERROR] NVIDIA_API_KEY environment variable is not set.")
+        print("[HINT]  Get a free key at: https://build.nvidia.com/settings/api-keys")
         sys.exit(1)
 
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Accept": "application/json",
+    }
+
+    payload = {
+        "model": NVIDIA_MODEL,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 1024,
+        "temperature": 0.7,
+        "top_p": 0.95,
+        "stream": False,
+        "chat_template_kwargs": {"enable_thinking": False},
+    }
+
     try:
-        print(f"[INFO] Calling Gemini API ({GEMINI_MODEL})...")
+        print(f"[INFO] Calling NVIDIA API ({NVIDIA_MODEL})...")
 
-        client = genai.Client(api_key=api_key)
-
-        response = client.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                temperature=0.7,
-                max_output_tokens=1024,
-            ),
+        response = requests.post(
+            NVIDIA_API_URL,
+            headers=headers,
+            json=payload,
+            timeout=60,
         )
 
-        if not response.text:
-            print("[ERROR] Gemini API returned an empty response.")
+        if response.status_code == 401:
+            print("[ERROR] Invalid NVIDIA_API_KEY. Check your GitHub Secret.")
+            sys.exit(1)
+        elif response.status_code == 429:
+            print("[ERROR] NVIDIA rate limit exceeded. Will retry on next push.")
+            sys.exit(1)
+        elif response.status_code != 200:
+            print(f"[ERROR] NVIDIA API returned status {response.status_code}: {response.text}")
             sys.exit(1)
 
-        generated_text = response.text.strip()
+        data = response.json()
+        generated_text = data["choices"][0]["message"]["content"].strip()
         generated_text = strip_code_fences(generated_text)
 
-        print(f"[INFO] API call successful.")
+        usage = data.get("usage", {})
+        print(
+            f"[INFO] API call successful. Tokens used — "
+            f"input: {usage.get('prompt_tokens', '?')}, "
+            f"output: {usage.get('completion_tokens', '?')}"
+        )
         return generated_text
 
-    except Exception as exc:
-        error_msg = str(exc).lower()
-
-        if "api_key" in error_msg or "api key" in error_msg or "invalid" in error_msg:
-            print(f"[ERROR] Invalid GEMINI_API_KEY. Check your GitHub Secret. Details: {exc}")
-        elif "quota" in error_msg or "rate" in error_msg or "429" in error_msg:
-            print(f"[ERROR] Gemini rate limit / quota exceeded. Details: {exc}")
-        elif "connection" in error_msg or "network" in error_msg or "timeout" in error_msg:
-            print(f"[ERROR] Network error while calling Gemini API: {exc}")
-        elif "blocked" in error_msg or "safety" in error_msg:
-            print(f"[ERROR] Gemini safety filter triggered. Details: {exc}")
-        else:
-            print(f"[ERROR] Gemini API error: {exc}")
-
+    except requests.exceptions.Timeout:
+        print("[ERROR] Request timed out after 60s.")
+        sys.exit(1)
+    except requests.exceptions.ConnectionError as exc:
+        print(f"[ERROR] Network error while calling NVIDIA API: {exc}")
+        sys.exit(1)
+    except (KeyError, IndexError) as exc:
+        print(f"[ERROR] Unexpected API response format: {exc}")
+        print(f"[DEBUG] Response: {response.text[:500]}")
         sys.exit(1)
 
 
@@ -243,13 +260,13 @@ def write_readme(content: str) -> None:
 
 def main() -> None:
     print("=" * 60)
-    print("  Project Discipline — README Auto-Updater (Gemini)")
+    print("  Project Discipline — README Auto-Updater (Gemma 4)")
     print("  repo: hxrshityadav/DSA")
     print("=" * 60)
 
     metrics        = collect_metrics()
     prompt         = build_prompt(metrics)
-    ai_block       = call_gemini_api(prompt)
+    ai_block       = call_nvidia_api(prompt)
 
     print("[INFO] AI-generated block preview:")
     print("─" * 40)

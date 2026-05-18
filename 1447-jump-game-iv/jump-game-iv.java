@@ -41,6 +41,6 @@ class Solution {
             steps++;
         }
 
-        return -1;
+        return 1;
     }
 }

@@ -40,16 +40,16 @@
 
 | Metric | Value |
 | :--- | :--- |
-| 🚀 Total Git Commits | **548** |
-| 🎡 Problems on LeetCode | **74** |
-| 🎓 Problems on GFG | **0** |
+| 🚀 Total Git Commits | **551** |
+| 🧩 Problems on LeetCode | **74** |
+| 🟢 Problems on GFG | **0** |
 | 🏆 Total Problems Solved | **74** |
 | ☕ Primary Language | **Java (100%)** |
 | 🔄 Sync Method (LC) | Auto-Synced via LeetSync |
 | 🔄 Sync Method (GFG) | Auto-Synced via GFG-to-GitHub |
 | 🔥 Streak Status | **Active** |
 
-> "548 commits. 74 problems. 0 excuses."
+> "551 commits. 74 problems. 0 excuses."
 
 <!-- AI-STATS-END -->
 
